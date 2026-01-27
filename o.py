@@ -35,24 +35,55 @@ class maze:
             if not self.visited[x][y - 1]:
                 mylist += [(x, y - 1)]
 
-        if x + 1 < self.width:
-            if not self.visited[x + 1][y]:
-                mylist += [(x + 1, y)]
         if y + 1 < self.height:
             if not self.visited[x][y + 1]:
                 mylist += [(x, y + 1)]
+        if x + 1 < self.width:
+            if not self.visited[x + 1][y]:
+                mylist += [(x + 1, y)]
         return mylist
 
-    def dfs_algo(self, x, y):
+    def dfs_generate(self, x, y):
         self.visited[x][y] = True
 
         neighbors = self.get_neighbors(x, y)
         random.shuffle(neighbors)
-
         for nx, ny in neighbors:
             if not self.visited[nx][ny]:
                 self.remove_wall(x, y, nx, ny)
-                self.dfs_algo(nx, ny)
+                self.dfs_generate(nx, ny)
+
+    def get_direction(self, x, y):
+        mylist = []
+        if x - 1 >= 0 and (self.grid[x][y] & 8) == 0:
+            mylist.append((x - 1, y, 'W'))
+        if y - 1 >= 0 and (self.grid[x][y] & 1) == 0:
+            mylist.append((x, y - 1, 'N'))
+        if x + 1 < self.width and (self.grid[x][y] & 2) == 0:
+            mylist.append((x + 1, y, 'S'))
+        if y + 1 < self.height and (self.grid[x][y] & 4) == 0:
+            mylist.append((x, y + 1, 'E'))
+        return mylist
+
+    def dfs_solver(self, x, y, exit_x, exit_y, path=None):
+        if path is None:
+            path = []
+        self.visited[x][y] = True
+        if (x, y) == (exit_x, exit_y):
+            return True
+
+        next = self.get_direction(x, y)
+        if not next:
+            return False
+
+        for nx, ny, dir in next:
+            if not self.visited[nx][ny]:
+                path.append(dir)
+                solution = self.dfs_solver(nx, ny, exit_x, exit_y, path)
+                if solution:
+                    return True
+                path.pop()
+        return False
 
     def display(self, entry=None, exit_node=None):
         print(self.wall_color + "+" + "---+" * self.width)
@@ -94,7 +125,7 @@ class MazeApp:
         entry = tuple(map(int, self.config['ENTRY'].split(',')))
         exit_node = tuple(map(int, self.config['EXIT'].split(',')))
 
-        self.maze.dfs_algo(entry[0], entry[1])
+        self.maze.dfs_generate(entry[0], entry[1])
 
         while True:
             self.maze.display(entry, exit_node)
@@ -103,14 +134,12 @@ class MazeApp:
 
             if choice == 'r':
                 self.maze = maze(self.maze.width, self.maze.height)
-                self.maze.dfs_algo(entry[0], entry[1])
+                self.maze.dfs_generate(entry[0], entry[1])
             elif choice == 's':
                 print("Solving maze...")
-                solution = (
-                    self.maze.solve
-                    (entry[0], entry[1], exit_node[0], exit_node[1])
-                )
-                self.maze.save_to_file(entry, exit, solution)
+                solution = []
+                self.maze.dfs_solver(entry[0], entry[1], exit_node[0], exit_node[1], solution)
+                # self.maze.save_to_file(entry, exit, solution)
                 if solution:
                     print(f"Solution found! Steps: {len(solution)}")
                     print("Path: " + "".join(solution))
