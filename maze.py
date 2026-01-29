@@ -7,7 +7,7 @@ class Maze:
         self.width = width
         self.height = height
         self.grid = [[15 for _ in range(width)] for _ in range(height)]
-        self.visited = [[False for _ in range(height)] for _ in range(width)]
+        self.visited = [[False for _ in range(width)] for _ in range(height)]
         self.wall_color = "\033[34m"
 
     def remove_wall(self, x1, y1, x2, y2):
@@ -24,6 +24,19 @@ class Maze:
         elif dy == -1:
             self.grid[y1][x1] &= ~1
             self.grid[y2][x2] &= ~4
+
+    def print_42(self, x, y):
+
+        matrix_42 = [
+            [(0, 0), (0, 4), (0, 5), (0, 6)],
+            [(1, 0), (1, 6)],
+            [(2, 0), (2, 1), (2, 2), (2, 4), (2, 5), (2, 6)],
+            [(3, 2), (3, 4)],
+            [(4, 2), (4, 4), (4, 5), (4, 6)]
+        ]
+        for i in matrix_42:
+            for tup in i:
+                self.visited[y + tup[0]][x + tup[1]] = True
 
     def get_nextors(self, x, y) -> list:
         mylist = []
@@ -51,8 +64,7 @@ class Maze:
                 self.remove_wall(x, y, nx, ny)
                 self.dfs_algo(nx, ny)
 
-    def display(self, entry=None, exit_node=None,
-      show_path=False, f="output_file.txt"):
+    def display(self, entry=None, exit_node=None, show_path=False, f="output_file.txt"):
         print(self.wall_color + "+" + "---+" * self.width)
         fi = open(f, "w")
         for y in range(self.height):
@@ -104,10 +116,12 @@ class Maze:
         return []
 
 
-m = Maze(6, 6)
+m = Maze(21, 22)
+if m.height >= 12 and m.width >= 11:
+    p_y = (m.height // 2) - (5 // 2)
+    p_x = (m.width // 2) - (7 // 2)
+    m.print_42(p_x, p_y)
 m.dfs_algo(0, 0)
 m.display((0, 0), (5, 5))
-if m.height > 10 and m.width > 10:
-    print("42")
 path = m.solve(0, 0, 5, 5)
 print(path)
