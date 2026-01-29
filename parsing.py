@@ -28,7 +28,7 @@ class Mazeconfig:
                         except Exception as e:
                             print(f"Error parsing line '{line}': {e}")
                             return None
-
+            return self.param
         except Exception:
             print("ERROR: cannot open the file")
         print(self.param)
