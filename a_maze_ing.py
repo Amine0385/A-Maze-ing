@@ -140,10 +140,6 @@ class Maze:
                 )
                 result = "".join(mylist)
                 fo.write(f"{result}\n")
-                m.display(
-                        param['ENTRY'],
-                        param['EXIT']
-                    )
         except Exception:
             print("ERROR: cannot open the file")
 
