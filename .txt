@@ -1,0 +1,7 @@
+.
+├── a_maze_ing.py         # البرنامج الرئيسي (UI + Config Parsing)
+├── maze_generator.py     # المحرك (Maze class: DFS + BFS)
+├── config.txt            # ملف الإعدادات
+├── Makefile              # لتشغيل البرنامج بسهولة
+├── README.md             # شرح بسيط للبرنامج (إختياري ولكن احترافي)
+└── maze.txt              # الملف اللي كيخرج فيه الـ Hex والحل
