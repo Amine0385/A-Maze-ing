@@ -1,169 +1,137 @@
-import sys
-import random
-from collections import deque
+class display():
+    def __init__(self):
+        pass
 
+    def display_bit(self, filename):
+        try:
+            mylist = []
+            with open(filename, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or "," in line: # Stop if we hit config data
+                        break
+                    new_line = []
+                    for c in line:
+                        try:
+                            new_line.append(int(c, 16))
+                        except ValueError:
+                            continue
+                    if new_line:
+                        mylist.append(new_line)
+                return mylist
+        except Exception as e:
+            print(f"Error reading bit map: {e}")
+            return []
 
-class Maze:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-        self.grid = [[15 for _ in range(width)] for _ in range(height)]
-        self.visited = [[False for _ in range(width)] for _ in range(height)]
-        self.wall_color = "\033[34m"
+    def draw(self, array, width, height, entry, exit_node, solve):
+        START_COLOR = '\033[3m' # Magenta background (Entry)
+        WALL_COLOR = '\033[47m' # White background
+        PATH_COLOR = '\033[40m' # Black background
+        SOLVE_COLOR = '\033[41m' # Red background (Exit)
+        RESET = '\033[0m'
+        
+        canvas_h = height * 2 + 1
+        canvas_w = width * 2 + 1
+        canvas = [[1 for _ in range(canvas_w)] for _ in range(canvas_h)]
+        
+        for y in range(height):
+            for x in range(width):
+                cell = array[y][x]
+                cy = y * 2 + 1
+                cx = x * 2 + 1
+                canvas[cy][cx] = 0
+                if not (cell & 1): 
+                    canvas[cy-1][cx] = 0
+                if not (cell & 4):
+                    canvas[cy+1][cx] = 0
+                if not (cell & 8):
+                    canvas[cy][cx-1] = 0
+                if not (cell & 2):
+                    canvas[cy][cx+1] = 0
+        output = []
+        flag1 = 0
+        flag2 = 0
+        for r in range(canvas_h):
+            line = ""
+            for c in range(canvas_w):
+                is_wall = canvas[r][c] == 1
+                is_entry = False
+                is_exit = False
+                is_solve = False
+                cell_y = (r - 1) // 2
+                cell_x = (c - 1) // 2
+                if not is_wall and 0 <= cell_y < height and 0 <= cell_x < width:
+                    if (cell_x, cell_y) == tuple(entry):
+                        is_entry = True
+                    elif (cell_x, cell_y) == tuple(exit_node):
+                        is_exit = True
+                    for tup in solve:
+                        if (cell_y, cell_x) == tuple(tup):
+                            is_solve = True
+                            solve.remove(tup)
+                            break
 
-    def remove_wall(self, x1, y1, x2, y2):
-        dx, dy = x2 - x1, y2 - y1
-        if dx == 1:
-            self.grid[y1][x1] &= ~2
-            self.grid[y2][x2] &= ~8
-        elif dx == -1:
-            self.grid[y1][x1] &= ~8
-            self.grid[y2][x2] &= ~2
-        elif dy == 1:
-            self.grid[y1][x1] &= ~4
-            self.grid[y2][x2] &= ~1
-        elif dy == -1:
-            self.grid[y1][x1] &= ~1
-            self.grid[y2][x2] &= ~4
-
-    def get_nextors(self, x, y) -> list:
-        mylist = []
-        if x - 1 >= 0:
-            if not (self.visited[y][x - 1]):
-                mylist += [(y, x - 1)]
-        if y - 1 >= 0:
-            if not self.visited[y - 1][x]:
-                mylist += [(y - 1, x)]
-
-        if x + 1 < self.width:
-            if not self.visited[y][x + 1]:
-                mylist += [(y, x + 1)]
-        if y + 1 < self.height:
-            if not self.visited[y + 1][x]:
-                mylist += [(y + 1, x)]
-        return mylist
-
-    def dfs_algo(self, x, y):
-        self.visited[y][x] = True
-        nextors = self.get_nextors(x, y)
-        random.shuffle(nextors)
-        for ny, nx in nextors:
-            if not self.visited[ny][nx]:
-                self.remove_wall(x, y, nx, ny)
-                self.dfs_algo(nx, ny)
-
-    def display(self, entry=None, exit_node=None, show_path=False, f="output_file.txt"):
-        print(self.wall_color + "+" + "---+" * self.width)
-        fi = open(f, "w")
-        for y in range(self.height):
-            row = self.wall_color + "|"
-            bottom = self.wall_color + "+"
-            for x in range(self.width):
-                cell = self.grid[y][x]
-                content = "   "
-                if (x, y) == entry:
-                    content = "\033[41m S \033[0m"
-                elif (x, y) == exit_node:
-                    content = "\033[42m E \033[0m"
-
-                row += content + (self.wall_color + "|" if cell & 2 else " ")
-                bottom += (self.wall_color + "---+" if cell & 4 else "   +")
-                fi.write(hex(self.grid[y][x])[2:].upper())
-            print(row)
-            print(bottom)
-            fi.write("\n")
-        fi.write("\n")
-        fi.write(f"{entry[0]},{entry[1]}\n")
-        fi.write(f"{exit_node[0]},{exit_node[1]}\n")
-
-    def solve(self, start_x, start_y, end_x, end_y):
-        queue = deque([(start_x, start_y, [])])
-        visited = set()
-        visited.add((start_x, start_y))
-        while queue:
-            x, y, path = queue.popleft()
-            if x == end_x and y == end_y:
-                return path
-
-            current_cell = self.grid[y][x]
-            moves = [
-                (0, -1, 'N', 1),
-                (0, 1, 'S', 4),
-                (1, 0, 'E', 2),
-                (-1, 0, 'W', 8)
-            ]
-            for dx, dy, direction, wall_bits in moves:
-                nx = x + dx
-                ny = y + dy
-                if 0 <= nx < self.width and 0 <= ny < self.height:
-                    if not (current_cell & wall_bits):
-                        if (nx, ny) not in visited:
-                            visited.add((nx, ny))
-                            new_path = path + [direction]
-                            queue.append((nx, ny, new_path))
-        return []
-
-
-class MazeApp:
-    def __init__(self, config_path):
-        self.config = self.load_config(config_path)
-        self.maze = Maze(int(self.config['WIDTH']), int(self.config['HEIGHT']))
-        self.run()
-
-    def load_config(self, path):
-        conf = {}
-        with open(path, 'r') as f:
-            for line in f:
-                if '=' in line:
-                    k, v = line.strip().split('=')
-                    conf[k.strip()] = v.strip()
-        return conf
-
-    def run(self):
-        entry = tuple(map(int, self.config['ENTRY'].split(',')))
-        exit_node = tuple(map(int, self.config['EXIT'].split(',')))
-        output_file = open("output_file.txt", "a")
-        self.maze.dfs_algo(entry[0], entry[1])
-
-        while True:
-            self.maze.display(entry, exit_node, "output_file.txt")
-            print("\nCommands: [R] Re-generate | [S] Solve | [Q] Quit")
-            choice = input("Select an option: ").lower()
-
-            if choice == 'r':
-                self.maze = Maze(self.maze.width, self.maze.height)
-                self.maze.generate(entry[0], entry[1])
-            elif choice == 's':
-                print("Solving maze...")
-                solution = self.maze.solve(entry[0], entry[1], exit_node[0], exit_node[1])
-
-                with open("output_file.txt", "w") as f:
-                    for row in self.maze.grid:
-                        f.write("".join(f"{cell:X}" for cell in row) + "\n")
-
-                    f.write("\n")
-                    f.write(f"{entry[0]},{entry[1]}\n")
-                    f.write(f"{exit_node[0]},{exit_node[1]}\n")
-
-                    if solution:
-                        f.write("".join(solution) + "\n")
-
-                if solution:
-                    print(f"Solution found! Steps: {len(solution)}")
-                    print("Path: " + "".join(solution))
+                if is_wall:
+                    line += f"{WALL_COLOR}  {RESET}"
+                elif is_entry and flag1 == 0:
+                    flag1 = 1
+                    line += f"{PATH_COLOR}🚩{RESET}"
+                elif is_exit and flag2 == 0:
+                    flag2 = 1
+                    line += f"{PATH_COLOR}🏁{RESET}"
+                elif is_solve:
+                    line += f"{SOLVE_COLOR}  {RESET}"
                 else:
-                    print("No solution found!")
+                    line += f"{PATH_COLOR}  {RESET}"
+            output.append(line)
 
-                input("\nPress Enter to continue...")
+        return output
 
-            elif choice == 'q':
-                break
+    def create_solve_cor(self, entry, str):
+        y, x = entry
+        mylist = []
+        for i in str:
+            if i == 'S':
+                tup1 = (y + 1, x)
+                tup2 = tup1 = (y + 2, x)
+                mylist.append(tup1)
+                mylist.append(tup2)
+                y = y + 1
+            if i == 'N':
+                tup1 = (y - 1, x)
+                # tup2 = (y - 2, x)
+                mylist.append(tup1)
+                # mylist.append(tup2)
+                y = y - 1
+            if i == 'W':
+                tup1 = (y, x - 1)
+                # tup2 = (y, x - 2)
+                mylist.append(tup1)
+                # mylist.append(tup2)
+                x = x - 1
+            if i == 'E':
+                # tup1 = (y, x + 2)
+                tup2 = (y, x + 1)
+                mylist.append(tup2)
+                # mylist.append(tup1)
+                x = x + 1
+        return mylist
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        MazeApp(sys.argv[1])
-    # m = Maze(6, 6)
-    # m.dfs_generate(0, 0)
-    # m.display((0, 0), (5, 5))
-    # print(m.solve(0, 0, 5, 6))
+    from parsing import Mazeconfig
+    pars = Mazeconfig("config.txt")
+    entry = pars.param.get("ENTRY", [0,1])
+    exit_node = pars.param.get("EXIT", [12,12])
+    str = "ESWSSENENNNWWWSSSSSSSESESSSEEEENESEEEE"
+    m = display()
+    cor = m.create_solve_cor(entry, str)
+    # print(str)
+    # print(cor)
+    array = m.display_bit("maze.txt")
+    if array:
+        h = len(array)
+        w = len(array[0]) if h > 0 else 0
+        result = m.draw(array, w, h, entry, exit_node, cor)
+        for row in result:
+            print(row)

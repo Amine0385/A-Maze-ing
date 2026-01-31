@@ -26,7 +26,6 @@ class Maze:
             self.grid[y2][x2] &= ~4
 
     def print_42(self, x, y):
-
         matrix_42 = [
             [(0, 0), (0, 4), (0, 5), (0, 6)],
             [(1, 0), (1, 6)],
@@ -116,12 +115,12 @@ class Maze:
         return []
 
 
-m = Maze(21, 22)
+m = Maze(5, 5)
 if m.height >= 12 and m.width >= 11:
     p_y = (m.height // 2) - (5 // 2)
     p_x = (m.width // 2) - (7 // 2)
     m.print_42(p_x, p_y)
 m.dfs_algo(0, 0)
-m.display((0, 0), (5, 5))
-path = m.solve(0, 0, 5, 5)
+m.display((0, 0), (4, 4))
+path = m.solve(0, 0, 4, 4)
 print(path)
