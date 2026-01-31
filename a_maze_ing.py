@@ -36,6 +36,37 @@ class Maze:
             self.grid[y1][x1] &= ~1
             self.grid[y2][x2] &= ~4
 
+    def display(self, entry=None, exit_node=None, show_path=False):
+        print(self.wall_color + "+" + "---+" * self.width)
+        for y in range(self.height):
+            row = self.wall_color + "|"
+            bottom = self.wall_color + "+"
+            for x in range(self.width):
+                cell = self.grid[y][x]
+                content = "   "
+                if (x, y) == entry:
+                    content = "\033[41m S \033[0m"
+                elif (x, y) == exit_node:
+                    content = "\033[42m E \033[0m"
+
+                row += content + (self.wall_color + "|" if cell & 2 else " ")
+                bottom += (self.wall_color + "---+" if cell & 4 else "   +")
+            print(row)
+            print(bottom)
+
+    def print_42(self, x, y):
+
+        matrix_42 = [
+            [(0, 0), (0, 4), (0, 5), (0, 6)],
+            [(1, 0), (1, 6)],
+            [(2, 0), (2, 1), (2, 2), (2, 4), (2, 5), (2, 6)],
+            [(3, 2), (3, 4)],
+            [(4, 2), (4, 4), (4, 5), (4, 6)]
+        ]
+        for i in matrix_42:
+            for tup in i:
+                self.visited[y + tup[0]][x + tup[1]] = True
+
     def get_nextors(self, x: int, y: int) -> list:
         mylist: list[tuple[int, int]] = []
         if x - 1 >= 0:
@@ -90,12 +121,16 @@ class Maze:
         return []
 
     def main(self, param: dict, file_output: str):
+        if m.height >= 12 and m.width >= 11:
+            p_y = (m.height // 2) - (5 // 2)
+            p_x = (m.width // 2) - (7 // 2)
+            m.print_42(p_x, p_y)
         self.dfs_algo(param["ENTRY"][0], param["ENTRY"][1])
         try:
             with open(file_output, "w") as fo:
                 for i in range(self.height):
                     for j in range(self.width):
-                        fo.write(str(hex(self.grid[j][i])[2:]).upper())
+                        fo.write(str(hex(self.grid[i][j])[2:]).upper())
                     fo.write("\n")
                 fo.write(f"\n{param['ENTRY'][0]},{param['ENTRY'][1]}\n")
                 fo.write(f"{param['EXIT'][0]},{param['EXIT'][1]}\n")
@@ -105,6 +140,10 @@ class Maze:
                 )
                 result = "".join(mylist)
                 fo.write(f"{result}\n")
+                m.display(
+                        param['ENTRY'],
+                        param['EXIT']
+                    )
         except Exception:
             print("ERROR: cannot open the file")
 
