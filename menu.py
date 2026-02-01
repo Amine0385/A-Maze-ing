@@ -126,46 +126,56 @@ class Maze:
         except Exception:
             print("ERROR: cannot open the file")
 
+
+def generate():
+    ds = display()
+    pars = Mazeconfig("config.txt")
+    m = Maze(pars.param["WIDTH"], pars.param["HEIGHT"])
+    param = pars.load_config("config.txt")
+    m.main(param, pars.param["OUTPUT_FILE"])
+    array = ds.display_bit(pars.param["OUTPUT_FILE"])
+    if array:
+        h = len(array)
+        w = len(array[0])
+        result = ds.draw_without_solve(array, w, h, pars.param["ENTRY"], pars.param["EXIT"])
+        for row in result:
+            print(row)
+
+
+def solve_and_draw():
+    ds = display()
+    pars = Mazeconfig("config.txt")
+    dir = ds.display_dir("maze.txt")
+    cor = ds.create_solve_cor(pars.param["ENTRY"], dir)
+    array = ds.display_bit("maze.txt")
+    if array:
+        h = len(array)
+        w = len(array[0]) if h > 0 else 0
+        result = ds.draw_with_solve(array, w, h, pars.param["ENTRY"], pars.param["EXIT"], cor)
+        for row in result:
+            print(row)
+
 def menu():
+    generate()
     while True:
-        try:
-            n = int(input())
-        except ValueError as e:
-            print(e)
-            sys.exit()
+        print("=== A-Maze-ing ===")
+        print("1. Re-generate a new maze")
+        print("2. Show/Hide path from entry to exit")
+        print("3. ")
+        print("4. Quit")
+        
+        n = int(input())
+        
         match n:
             case 1:
-                ds = display()
-                str = ds.display_dir("maze.txt")
-                # print(cor)
-                # print(str)
-                array = ds.display_bit("maze.txt")
-                pars = Mazeconfig("config.txt")
-                m = Maze(pars.param["WIDTH"], pars.param["HEIGHT"])
-                param = pars.load_config("config.txt")
-                m.main(param, pars.param["OUTPUT_FILE"])
-
-                if array:
-                    h = len(array)
-                    w = len(array[0]) if h > 0 else 0
-                result = ds.draw_without_solve(array, w, h, pars.param["ENTRY"], pars.param["EXIT"])
-                for row in result:
-                    print(row)
+                generate()
             case 2:
-                ds = display()
-                str = ds.display_dir("maze.txt")
-                cor = ds.create_solve_cor(pars.param["ENTRY"], str)
-                # print(cor)
-                # print(str)
-                array = ds.display_bit("maze.txt")
-                if array:
-                    h = len(array)
-                    w = len(array[0]) if h > 0 else 0
-                    result = ds.draw_with_solve(array, w, h, pars.param["ENTRY"], pars.param["EXIT"], cor)
-                    for row in result:
-                        print(row)
+                solve_and_draw()
             case 3:
+                pass
+            case 4:
                 sys.exit()
-
+            case _:
+                pass
 
 menu()

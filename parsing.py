@@ -37,4 +37,4 @@ class Mazeconfig:
         print(self.param)
 
 
-m1 = Mazeconfig("config.txt")
+# m1 = Mazeconfig("config.txt")
