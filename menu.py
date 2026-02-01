@@ -105,7 +105,21 @@ class Maze:
                             queue.append((nx, ny, new_path))
         return []
 
-    def main(self, param: dict, file_output: str):
+    def main(self, param: dict, file_output: str, check: int):
+        if check:
+            random.seed(8)
+        if not param["PERFECT"]:
+            self.visited: list[bool] = [
+                [False for _ in range(self.width)]
+                for _ in range(self.height)
+            ]
+            if self.height >= 12 and self.width >= 11:
+                self.print_42()
+            self.dfs_algo(param["ENTRY"][0], param["ENTRY"][1])
+        self.visited: list[bool] = [
+            [False for _ in range(self.width)]
+            for _ in range(self.height)
+        ]
         if self.height >= 12 and self.width >= 11:
             self.print_42()
         self.dfs_algo(param["ENTRY"][0], param["ENTRY"][1])
@@ -127,12 +141,13 @@ class Maze:
             print("ERROR: cannot open the file")
 
 
-def generate():
+def generate(check):
+
     ds = display()
     pars = Mazeconfig("config.txt")
     m = Maze(pars.param["WIDTH"], pars.param["HEIGHT"])
     param = pars.load_config("config.txt")
-    m.main(param, pars.param["OUTPUT_FILE"])
+    m.main(param, pars.param["OUTPUT_FILE"], check)
     array = ds.display_bit(pars.param["OUTPUT_FILE"])
     if array:
         h = len(array)
@@ -155,20 +170,19 @@ def solve_and_draw():
         for row in result:
             print(row)
 
+
 def menu():
-    generate()
+    generate(1)
     while True:
         print("=== A-Maze-ing ===")
         print("1. Re-generate a new maze")
         print("2. Show/Hide path from entry to exit")
         print("3. ")
         print("4. Quit")
-        
         n = int(input())
-        
         match n:
             case 1:
-                generate()
+                generate(0)
             case 2:
                 solve_and_draw()
             case 3:
@@ -177,5 +191,6 @@ def menu():
                 sys.exit()
             case _:
                 pass
+
 
 menu()
