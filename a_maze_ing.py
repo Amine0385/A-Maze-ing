@@ -1,7 +1,8 @@
-# import sys
+import sys
 import random
 from collections import deque
 from parsing import Mazeconfig
+from display import display
 
 
 class Maze:
@@ -36,26 +37,27 @@ class Maze:
             self.grid[y1][x1] &= ~1
             self.grid[y2][x2] &= ~4
 
-    def display(self, entry=None, exit_node=None, show_path=False):
-        print(self.wall_color + "+" + "---+" * self.width)
-        for y in range(self.height):
-            row = self.wall_color + "|"
-            bottom = self.wall_color + "+"
-            for x in range(self.width):
-                cell = self.grid[y][x]
-                content = "   "
-                if (x, y) == entry:
-                    content = "\033[41m S \033[0m"
-                elif (x, y) == exit_node:
-                    content = "\033[42m E \033[0m"
+    # def display(self, entry=None, exit_node=None, show_path=False):
+    #     print(self.wall_color + "+" + "---+" * self.width)
+    #     for y in range(self.height):
+    #         row = self.wall_color + "|"
+    #         bottom = self.wall_color + "+"
+    #         for x in range(self.width):
+    #             cell = self.grid[y][x]
+    #             content = "   "
+    #             if (x, y) == entry:
+    #                 content = "\033[41m S \033[0m"
+    #             elif (x, y) == exit_node:
+    #                 content = "\033[42m E \033[0m"
 
-                row += content + (self.wall_color + "|" if cell & 2 else " ")
-                bottom += (self.wall_color + "---+" if cell & 4 else "   +")
-            print(row)
-            print(bottom)
+    #             row += content + (self.wall_color + "|" if cell & 2 else " ")
+    #             bottom += (self.wall_color + "---+" if cell & 4 else "   +")
+    #         print(row)
+    #         print(bottom)
 
-    def print_42(self, x, y):
-
+    def print_42(self):
+        y = (self.height // 2) - (5 // 2)
+        x = (self.width // 2) - (7 // 2)
         matrix_42 = [
             [(0, 0), (0, 4), (0, 5), (0, 6)],
             [(1, 0), (1, 6)],
@@ -121,10 +123,8 @@ class Maze:
         return []
 
     def main(self, param: dict, file_output: str):
-        if m.height >= 12 and m.width >= 11:
-            p_y = (m.height // 2) - (5 // 2)
-            p_x = (m.width // 2) - (7 // 2)
-            m.print_42(p_x, p_y)
+        if self.height >= 12 and self.width >= 11:
+            self.print_42()
         self.dfs_algo(param["ENTRY"][0], param["ENTRY"][1])
         try:
             with open(file_output, "w") as fo:
@@ -143,8 +143,34 @@ class Maze:
         except Exception:
             print("ERROR: cannot open the file")
 
+def menu():
+    while True:
+        try:
+            n = int(input())
+        except ValueError as e:
+            print(e)
+            sys.exit()
+        match n:
+            case 1:
+                pars = Mazeconfig("config.txt")
+                m = Maze(pars.param["WIDTH"], pars.param["HEIGHT"])
+                param = pars.load_config("config.txt")
+                m.main(param, pars.param["OUTPUT_FILE"])
+            case 2:
+                ds = display()
+                str = ds.display_dir("maze.txt")
+                cor = ds.create_solve_cor(pars.param["ENTRY"], str)
+                # print(cor)
+                # print(str)
+                array = ds.display_bit("maze.txt")
+                if array:
+                    h = len(array)
+                    w = len(array[0]) if h > 0 else 0
+                    result = ds.draw(array, w, h, pars.param["ENTRY"], pars.param["EXIT"], cor)
+                    for row in result:
+                        print(row)
+            case 3:
+                sys.exit()
 
-pars = Mazeconfig("config.txt")
-m = Maze(pars.param["WIDTH"], pars.param["HEIGHT"])
-param = pars.load_config("config.txt")
-m.main(param, pars.param["OUTPUT_FILE"])
+
+menu()

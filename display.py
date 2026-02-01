@@ -62,41 +62,27 @@ class display():
                 if not (cell & 2):
                     matrix[cy][cx+1] = 0
         
-        # Pre-calculate precise solution pixels (centers and passages)
         solve_pixels = set()
         curr_x, curr_y = entry
         
-        # solve list contains (row, col) coordinates
         for next_y, next_x in solve:
-            # Convert logical coords to canvas coords
             p1_r = 2 * curr_y + 1
             p1_c = 2 * curr_x + 1
             p2_r = 2 * next_y + 1
             p2_c = 2 * next_x + 1
-            
-            # Add center of next cell
             solve_pixels.add((p2_r, p2_c))
-            
-            # Add passage between current and next
             mid_r = (p1_r + p2_r) // 2
             mid_c = (p1_c + p2_c) // 2
             solve_pixels.add((mid_r, mid_c))
-            
             curr_y, curr_x = next_y, next_x
-
         output = []
         for r in range(canvas_h):
             line = ""
             for c in range(canvas_w):
                 is_wall = matrix[r][c] == 1
-                
-                # Check for exact entry/exit centers
                 is_entry = (r == entry[1] * 2 + 1 and c == entry[0] * 2 + 1)
                 is_exit = (r == exit_node[1] * 2 + 1 and c == exit_node[0] * 2 + 1)
-                
-                # Check if pixel is part of the solution path
                 is_solve = (r, c) in solve_pixels
-                
                 if is_wall:
                     line += f"{WALL_COLOR}  {RESET}"
                 elif is_entry:
@@ -112,7 +98,7 @@ class display():
         return output
 
     def create_solve_cor(self, entry, str):
-        x, y = entry  # Fixed: Unpack as x, y (col, row)
+        x, y = entry
         mylist = []
         for i in str:
             if i == 'S':
@@ -132,18 +118,4 @@ class display():
 
 if __name__ == "__main__":
     from parsing import Mazeconfig
-    pars = Mazeconfig("config.txt")
-    entry = pars.param.get("ENTRY", [0, 1])
-    exit_node = pars.param.get("EXIT", [12, 12])
-    m = display()
-    str = m.display_dir("maze.txt")
-    cor = m.create_solve_cor(entry, str)
-    # print(cor)
-    # print(str)
-    array = m.display_bit("maze.txt")
-    if array:
-        h = len(array)
-        w = len(array[0]) if h > 0 else 0
-        result = m.draw(array, w, h, entry, exit_node, cor)
-        for row in result:
-            print(row)
+    
