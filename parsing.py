@@ -33,5 +33,3 @@ class Mazeconfig:
             print("ERROR: cannot open the file")
         print(self.param)
 
-
-m1 = Mazeconfig("config.txt")
