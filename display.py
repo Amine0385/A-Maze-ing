@@ -152,20 +152,3 @@ class display():
                 x += 1
                 mylist.append((y, x))
         return mylist
-
-
-# if __name__ == "__main__":
-#     from parsing import Mazeconfig
-#     pars = Mazeconfig("config.txt")
-#     entry = pars.param.get("ENTRY", [0, 1])
-#     exit_node = pars.param.get("EXIT", [12, 12])
-#     m = display()
-#     str = m.display_dir("maze.txt")
-#     cor = m.create_solve_cor(entry, str)
-#     array = m.display_bit("maze.txt")
-#     if array:
-#         h = len(array)
-#         w = len(array[0]) if h > 0 else 0
-#         result = m.draw_without_solve(array, w, h, entry, exit_node)
-#         for row in result:
-#             print(row)

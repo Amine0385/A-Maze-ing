@@ -5,7 +5,7 @@ from parsing import Mazeconfig
 from display import display
 
 
-class Maze:
+class MazeGenerator:
     def __init__(self, width: int, height: int) -> None:
         self.width: int = width
         self.height: int = height
@@ -37,7 +37,7 @@ class Maze:
             self.grid[y1][x1] &= ~1
             self.grid[y2][x2] &= ~4
 
-    def print_42(self):
+    def generate_42(self):
         y = (self.height // 2) - (5 // 2)
         x = (self.width // 2) - (7 // 2)
         matrix_42 = [
@@ -117,27 +117,27 @@ class Maze:
                 fo.write("".join(mylist) + "\n")
         except Exception:
             print(f"ERROR: Cannot open the file {file_output}")
-    
-    def main(self, param: dict, file_output: str, check: int):
+
+    def run_dfs(self, param):
+        self.visited = [[False for _ in range(self.width)] for _ in range(self.height)]
+        if self.height >= 12 and self.width >= 11:
+            self.generate_42()
+        self.dfs_algo(param["ENTRY"][0], param["ENTRY"][1])
+
+    def main_generator(self, param: dict, file_output: str, check: int):
         if check:
             random.seed(8)
-
-        def run_dfs():
-            self.visited = [[False for _ in range(self.width)] for _ in range(self.height)]
-            if self.height >= 12 and self.width >= 11:
-                self.print_42()
-            self.dfs_algo(param["ENTRY"][0], param["ENTRY"][1])
         if not param["PERFECT"]:
-            run_dfs()
-        run_dfs()
+            self.run_dfs(param)
+        self.run_dfs(param)
         self.write_in_file(param, file_output)
 
 
 def generate(ds, check):
     pars = Mazeconfig("config.txt")
-    m = Maze(pars.param["WIDTH"], pars.param["HEIGHT"])
+    m = MazeGenerator(pars.param["WIDTH"], pars.param["HEIGHT"])
     param = pars.load_config("config.txt")
-    m.main(param, pars.param["OUTPUT_FILE"], check)
+    m.main_generator(param, pars.param["OUTPUT_FILE"], check)
     array = ds.display_bit(pars.param["OUTPUT_FILE"])
     if array:
         h = len(array)
@@ -149,9 +149,9 @@ def generate(ds, check):
 
 def solve_and_draw(ds, flag):
     pars = Mazeconfig("config.txt")
-    dir = ds.display_dir("maze.txt")
+    dir = ds.display_dir(pars.param["OUTPUT_FILE"])
     cor = ds.create_solve_cor(pars.param["ENTRY"], dir)
-    array = ds.display_bit("maze.txt")
+    array = ds.display_bit(pars.param["OUTPUT_FILE"])
     if array:
         h = len(array)
         w = len(array[0]) if h > 0 else 0
