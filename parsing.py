@@ -1,6 +1,3 @@
-import sys
-
-
 class Mazeconfig:
     def __init__(self, filename):
         self.param = {}
@@ -30,11 +27,11 @@ class Mazeconfig:
                                 self.param[key] = value.upper() == "TRUE"
                         except Exception as e:
                             print(f"Error parsing line '{line}': {e}")
-                            sys.exit()
+                            return None
             return self.param
         except Exception:
             print("ERROR: cannot open the file")
         print(self.param)
 
 
-# m1 = Mazeconfig("config.txt")
+m1 = Mazeconfig("config.txt")

@@ -38,7 +38,7 @@ class display():
             return []
 
     def draw_with_solve(self, array, width, height, entry, exit_node, solve):
-        START_COLOR = '\033[41m'
+        START_COLOR = '\033[49m'
         WALL_COLOR = '\033[47m'
         PATH_COLOR = '\033[49m'
         SOLVE_COLOR = '\033[46m'
@@ -85,19 +85,18 @@ class display():
                 if is_wall:
                     line += f"{WALL_COLOR}  {RESET}"
                 elif is_entry:
-                    line += f"{START_COLOR}  {RESET}"
+                    line += f"{START_COLOR}🚕{RESET}"
                 elif is_exit:
-                    line += f"{START_COLOR}  {RESET}"
+                    line += f"🏁{RESET}"
                 elif is_solve:
                     line += f"{SOLVE_COLOR}  {RESET}"
                 else:
                     line += f"{PATH_COLOR}  {RESET}"
             output.append(line)
-
         return output
 
     def draw_without_solve(self, array, width, height, entry, exit_node):
-        START_COLOR = '\033[41m'
+        START_COLOR = '\033[49m'
         WALL_COLOR = '\033[47m'
         PATH_COLOR = '\033[49m'
         RESET = '\033[0m'
@@ -118,20 +117,6 @@ class display():
                     matrix[cy][cx-1] = 0
                 if not (cell & 2):
                     matrix[cy][cx+1] = 0
-        # solve_pixels = set()
-        # curr_x, curr_y = entry
-
-        # for next_y, next_x in solve:
-        #     p1_r = 2 * curr_y + 1
-        #     p1_c = 2 * curr_x + 1
-        #     p2_r = 2 * next_y + 1
-        #     p2_c = 2 * next_x + 1
-
-        #     solve_pixels.add((p2_r, p2_c))
-        #     mid_r = (p1_r + p2_r) // 2
-        #     mid_c = (p1_c + p2_c) // 2
-        #     solve_pixels.add((mid_r, mid_c))
-        #     curr_y, curr_x = next_y, next_x
         output = []
         for r in range(canvas_h):
             line = ""
@@ -142,13 +127,12 @@ class display():
                 if is_wall:
                     line += f"{WALL_COLOR}  {RESET}"
                 elif is_entry:
-                    line += f"{START_COLOR}  {RESET}"
+                    line += f"{START_COLOR}🚕{RESET}"
                 elif is_exit:
-                    line += f"{START_COLOR}  {RESET}"
+                    line += f"🏁{RESET}"
                 else:
                     line += f"{PATH_COLOR}  {RESET}"
             output.append(line)
-
         return output
 
     def create_solve_cor(self, entry, str):
@@ -170,20 +154,18 @@ class display():
         return mylist
 
 
-if __name__ == "__main__":
-    from parsing import Mazeconfig
-    pars = Mazeconfig("config.txt")
-    entry = pars.param.get("ENTRY", [0, 1])
-    exit_node = pars.param.get("EXIT", [12, 12])
-    m = display()
-    str = m.display_dir("maze.txt")
-    cor = m.create_solve_cor(entry, str)
-    # print(cor)
-    # print(str)
-    array = m.display_bit("maze.txt")
-    if array:
-        h = len(array)
-        w = len(array[0]) if h > 0 else 0
-        result = m.draw_without_solve(array, w, h, entry, exit_node)
-        for row in result:
-            print(row)
+# if __name__ == "__main__":
+#     from parsing import Mazeconfig
+#     pars = Mazeconfig("config.txt")
+#     entry = pars.param.get("ENTRY", [0, 1])
+#     exit_node = pars.param.get("EXIT", [12, 12])
+#     m = display()
+#     str = m.display_dir("maze.txt")
+#     cor = m.create_solve_cor(entry, str)
+#     array = m.display_bit("maze.txt")
+#     if array:
+#         h = len(array)
+#         w = len(array[0]) if h > 0 else 0
+#         result = m.draw_without_solve(array, w, h, entry, exit_node)
+#         for row in result:
+#             print(row)

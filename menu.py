@@ -37,7 +37,6 @@ class Maze:
             self.grid[y1][x1] &= ~1
             self.grid[y2][x2] &= ~4
 
-
     def print_42(self):
         y = (self.height // 2) - (5 // 2)
         x = (self.width // 2) - (7 // 2)
@@ -157,7 +156,7 @@ def generate(check):
             print(row)
 
 
-def solve_and_draw():
+def solve_and_draw(flag):
     ds = display()
     pars = Mazeconfig("config.txt")
     dir = ds.display_dir("maze.txt")
@@ -166,31 +165,42 @@ def solve_and_draw():
     if array:
         h = len(array)
         w = len(array[0]) if h > 0 else 0
-        result = ds.draw_with_solve(array, w, h, pars.param["ENTRY"], pars.param["EXIT"], cor)
+        if flag % 2:
+            result = ds.draw_with_solve(
+                array, w, h, pars.param["ENTRY"], pars.param["EXIT"], cor)
+        else:
+            result = ds.draw_without_solve(
+                array, w, h, pars.param["ENTRY"], pars.param["EXIT"])
         for row in result:
             print(row)
 
 
 def menu():
     generate(1)
+    flag = 1
     while True:
         print("=== A-Maze-ing ===")
         print("1. Re-generate a new maze")
         print("2. Show/Hide path from entry to exit")
         print("3. ")
         print("4. Quit")
-        n = int(input())
-        match n:
-            case 1:
-                generate(0)
-            case 2:
-                solve_and_draw()
-            case 3:
-                pass
-            case 4:
-                sys.exit()
-            case _:
-                pass
+        try:
+            n = int(input())
+            match n:
+                case 1:
+                    generate(0)
+                    flag = 1
+                case 2:
+                    solve_and_draw(flag)
+                    flag += 1
+                case 3:
+                    pass
+                case 4:
+                    sys.exit()
+                case _:
+                    pass
+        except Exception:
+            pass
 
 
 menu()
