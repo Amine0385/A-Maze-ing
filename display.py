@@ -80,7 +80,8 @@ class display():
             for c in range(canvas_w):
                 is_wall = matrix[r][c] == 1
                 is_entry = (r == entry[1] * 2 + 1 and c == entry[0] * 2 + 1)
-                is_exit = (r == exit_node[1] * 2 + 1 and c == exit_node[0] * 2 + 1)
+                is_exit = (
+                    r == exit_node[1] * 2 + 1 and c == exit_node[0] * 2 + 1)
                 is_solve = (r, c) in solve_pixels
                 if is_wall:
                     line += f"{WALL_COLOR}  {RESET}"
@@ -123,7 +124,8 @@ class display():
             for c in range(canvas_w):
                 is_wall = matrix[r][c] == 1
                 is_entry = (r == entry[1] * 2 + 1 and c == entry[0] * 2 + 1)
-                is_exit = (r == exit_node[1] * 2 + 1 and c == exit_node[0] * 2 + 1)
+                is_exit = (
+                    r == exit_node[1] * 2 + 1 and c == exit_node[0] * 2 + 1)
                 if is_wall:
                     line += f"{WALL_COLOR}  {RESET}"
                 elif is_entry:
