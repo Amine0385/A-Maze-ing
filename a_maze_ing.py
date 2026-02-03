@@ -133,10 +133,9 @@ class MazeGenerator:
         self.write_in_file(param, file_output)
 
 
-def generate(ds, check):
-    pars = Mazeconfig("config.txt")
+def generate(ds, check, file_input, pars):
     m = MazeGenerator(pars.param["WIDTH"], pars.param["HEIGHT"])
-    param = pars.load_config("config.txt")
+    param = pars.load_config(file_input)
     m.main_generator(param, pars.param["OUTPUT_FILE"], check)
     array = ds.display_bit(pars.param["OUTPUT_FILE"])
     if array:
@@ -147,8 +146,7 @@ def generate(ds, check):
             print(row)
 
 
-def solve_and_draw(ds, flag):
-    pars = Mazeconfig("config.txt")
+def solve_and_draw(ds, flag, pars):
     dir = ds.display_dir(pars.param["OUTPUT_FILE"])
     cor = ds.create_solve_cor(pars.param["ENTRY"], dir)
     array = ds.display_bit(pars.param["OUTPUT_FILE"])
@@ -165,9 +163,9 @@ def solve_and_draw(ds, flag):
             print(row)
 
 
-def menu():
+def menu(file_input, pars):
     ds = display()
-    generate(ds, 1)
+    generate(ds, 1, file_input, pars)
     flag = 1
     while True:
         print("=== A-Maze-ing ===")
@@ -180,10 +178,10 @@ def menu():
             n = int(input("> "))
             match n:
                 case 1:
-                    generate(ds, 0)
+                    generate(ds, 0, file_input, pars)
                     flag = 1
                 case 2:
-                    solve_and_draw(ds, flag)
+                    solve_and_draw(ds, flag, pars)
                     flag += 1
                 case 3:
                     print("Option 3 is not implemented yet.")
@@ -195,4 +193,13 @@ def menu():
             print("Please enter a number.")
 
 
-menu()
+if __name__ == "__main__":
+    try:
+        if len(sys.argv) < 2:
+            raise Exception("You did not enter a file name")
+        if sys.argv[1]:
+            pars = Mazeconfig(sys.argv[1])
+            menu(sys.argv[1], pars)
+
+    except Exception as e:
+        print(e)
