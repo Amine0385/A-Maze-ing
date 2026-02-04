@@ -1,20 +1,17 @@
-import sys
 import random
 from collections import deque
-from parsing import Mazeconfig
-from display import display
-import math
+from typing import Deque, Any
 
 
-class Maze:
+class MazeGenerator:
     def __init__(self, width: int, height: int) -> None:
         self.width: int = width
         self.height: int = height
-        self.grid: list[int] = [
+        self.grid: list[list[int]] = [
             [15 for _ in range(width)]
             for _ in range(height)
         ]
-        self.visited: list[bool] = [
+        self.visited: list[list[bool]] = [
             [False for _ in range(width)]
             for _ in range(height)
         ]
@@ -38,7 +35,7 @@ class Maze:
             self.grid[y1][x1] &= ~1
             self.grid[y2][x2] &= ~4
 
-    def print_42(self):
+    def generate_42(self):
         y = (self.height // 2) - (5 // 2)
         x = (self.width // 2) - (7 // 2)
         matrix_42 = [
@@ -80,8 +77,10 @@ class Maze:
     def solve(
         self, start_x: int, start_y: int, end_x: int, end_y: int
     ) -> list[str]:
-        queue: list[tuple[int, int, list]] = deque([(start_x, start_y, [])])
-        visited: set[int, int] = set()
+        queue: Deque[tuple[int, int, list[Any]]] = deque(
+            [(start_x, start_y, [])]
+        )
+        visited: set[tuple[int, int]] = set()
         visited.add((start_x, start_y))
         while queue:
             x, y, path = queue.popleft()
@@ -105,90 +104,32 @@ class Maze:
                             queue.append((nx, ny, new_path))
         return []
 
-    def write_in_file(self, param: dict, file_output: str, check: int):
-        if check:
-            random.seed(8)
-        if self.height >= 12 and self.width >= 11:
-            self.print_42()
-        self.dfs_algo(param["ENTRY"][0], param["ENTRY"][1])
+    def write_in_file(self, param: dict, file_output: str) -> None:
         try:
             with open(file_output, "w") as fo:
-                for i in range(self.height):
-                    for j in range(self.width):
-                        fo.write(str(hex(self.grid[i][j])[2:]).upper())
+                for row in self.grid:
+                    fo.write(
+                        "".join(str(hex(cell)[2:]).upper() for cell in row))
                     fo.write("\n")
                 fo.write(f"\n{param['ENTRY'][0]},{param['ENTRY'][1]}\n")
                 fo.write(f"{param['EXIT'][0]},{param['EXIT'][1]}\n")
-                mylist = self.solve(
-                    param['ENTRY'][0], param['ENTRY'][1],
-                    param['EXIT'][0], param['EXIT'][1]
-                )
-                result = "".join(mylist)
-                fo.write(f"{result}\n")
+                mylist = self.solve(param['ENTRY'][0], param['ENTRY'][1],
+                                    param['EXIT'][0], param['EXIT'][1])
+                fo.write("".join(mylist) + "\n")
         except Exception:
-            print("ERROR: cannot open the file")
+            print(f"ERROR: Cannot open the file {file_output}")
 
+    def run_dfs(self, param):
+        self.visited = [
+            [False for _ in range(self.width)] for _ in range(self.height)]
+        if self.height >= 12 and self.width >= 11:
+            self.generate_42()
+        self.dfs_algo(param["ENTRY"][0], param["ENTRY"][1])
 
-def generate(check):
-    ds = display()
-    pars = Mazeconfig("config.txt")
-    m = Maze(pars.param["WIDTH"], pars.param["HEIGHT"])
-    param = pars.load_config("config.txt")
-    m.write_in_file(param, pars.param["OUTPUT_FILE"], check)
-    array = ds.display_bit(pars.param["OUTPUT_FILE"])
-    if array:
-        h = len(array)
-        w = len(array[0])
-        result = ds.draw_without_solve(array, w, h, pars.param["ENTRY"], pars.param["EXIT"])
-        for row in result:
-            print(row)
-
-
-def solve_and_draw(flag):
-    ds = display()
-    pars = Mazeconfig("config.txt")
-    dir = ds.display_dir("maze.txt")
-    cor = ds.create_solve_cor(pars.param["ENTRY"], dir)
-    array = ds.display_bit("maze.txt")
-    if array:
-        h = len(array)
-        w = len(array[0]) if h > 0 else 0
-        if flag % 2:
-            result = ds.draw_with_solve(
-                array, w, h, pars.param["ENTRY"], pars.param["EXIT"], cor)
-        else:
-            result = ds.draw_without_solve(
-                array, w, h, pars.param["ENTRY"], pars.param["EXIT"])
-        for row in result:
-            print(row)
-
-
-def menu():
-    generate(1)
-    flag = 1
-    while True:
-        print("=== A-Maze-ing ===")
-        print("1. Re-generate a new maze")
-        print("2. Show/Hide path from entry to exit")
-        print("3. ")
-        print("4. Quit")
-        try:
-            n = int(input())
-            match n:
-                case 1:
-                    generate(0)
-                    flag = 1
-                case 2:
-                    solve_and_draw(flag)
-                    flag += 1
-                case 3:
-                    pass
-                case 4:
-                    sys.exit()
-                case _:
-                    pass
-        except Exception:
-            pass
-
-
-menu()
+    def main_generator(self, param: dict, file_output: str, check: int):
+        if check:
+            random.seed(8)
+        if not param["PERFECT"]:
+            self.run_dfs(param)
+        self.run_dfs(param)
+        self.write_in_file(param, file_output)
