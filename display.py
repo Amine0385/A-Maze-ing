@@ -39,6 +39,7 @@ class display():
 
     def draw_with_solve(self, array, width, height, entry, exit_node, solve):
         START_COLOR = '\033[49m'
+        FORTY_COLOR = '\033[100m'
         WALL_COLOR = '\033[47m'
         PATH_COLOR = '\033[49m'
         SOLVE_COLOR = '\033[46m'
@@ -54,12 +55,15 @@ class display():
                 matrix[cy][cx] = 0
                 if not (cell & 1):
                     matrix[cy-1][cx] = 0
+                if (cell & 1) and (cell & 2) and (cell & 4) and (cell & 8):
+                    matrix[cy][cx] = 2
                 if not (cell & 4):
                     matrix[cy+1][cx] = 0
                 if not (cell & 8):
                     matrix[cy][cx-1] = 0
                 if not (cell & 2):
                     matrix[cy][cx+1] = 0
+        output = []
         solve_pixels = set()
         curr_x, curr_y = entry
 
@@ -74,11 +78,11 @@ class display():
             mid_c = (p1_c + p2_c) // 2
             solve_pixels.add((mid_r, mid_c))
             curr_y, curr_x = next_y, next_x
-        output = []
         for r in range(canvas_h):
             line = ""
             for c in range(canvas_w):
                 is_wall = matrix[r][c] == 1
+                is_42 = matrix[r][c] == 2
                 is_entry = (r == entry[1] * 2 + 1 and c == entry[0] * 2 + 1)
                 is_exit = (
                     r == exit_node[1] * 2 + 1 and c == exit_node[0] * 2 + 1)
@@ -89,6 +93,8 @@ class display():
                     line += f"{START_COLOR}🚕{RESET}"
                 elif is_exit:
                     line += f"🏁{RESET}"
+                elif is_42:
+                    line += f"{FORTY_COLOR}  {RESET}"
                 elif is_solve:
                     line += f"{SOLVE_COLOR}  {RESET}"
                 else:
@@ -98,6 +104,7 @@ class display():
 
     def draw_without_solve(self, array, width, height, entry, exit_node):
         START_COLOR = '\033[49m'
+        FORTY_COLOR = '\033[100m'
         WALL_COLOR = '\033[47m'
         PATH_COLOR = '\033[49m'
         RESET = '\033[0m'
@@ -112,6 +119,8 @@ class display():
                 matrix[cy][cx] = 0
                 if not (cell & 1):
                     matrix[cy-1][cx] = 0
+                if (cell & 1) and (cell & 2) and (cell & 4) and (cell & 8):
+                    matrix[cy][cx] = 2
                 if not (cell & 4):
                     matrix[cy+1][cx] = 0
                 if not (cell & 8):
@@ -123,6 +132,7 @@ class display():
             line = ""
             for c in range(canvas_w):
                 is_wall = matrix[r][c] == 1
+                is_42 = matrix[r][c] == 2
                 is_entry = (r == entry[1] * 2 + 1 and c == entry[0] * 2 + 1)
                 is_exit = (
                     r == exit_node[1] * 2 + 1 and c == exit_node[0] * 2 + 1)
@@ -132,6 +142,8 @@ class display():
                     line += f"{START_COLOR}🚕{RESET}"
                 elif is_exit:
                     line += f"🏁{RESET}"
+                elif is_42:
+                    line += f"{FORTY_COLOR}  {RESET}"
                 else:
                     line += f"{PATH_COLOR}  {RESET}"
             output.append(line)

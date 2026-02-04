@@ -1,7 +1,7 @@
 import sys
 from parsing import Mazeconfig
 from display import display
-from generator import MazeGenerator
+from mazegen import MazeGenerator
 
 
 def generate(ds, check, file_input, pars):

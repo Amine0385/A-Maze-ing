@@ -32,4 +32,3 @@ class Mazeconfig:
         except Exception:
             print("ERROR: cannot open the file")
         print(self.param)
-
