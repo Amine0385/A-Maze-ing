@@ -1,9 +1,9 @@
 class Mazeconfig:
-    def __init__(self, filename):
-        self.param = {}
+    def __init__(self, filename: str) -> None:
+        self.param: dict = {}
         self.load_config(filename)
 
-    def load_config(self, filename):
+    def load_config(self, filename: str) -> dict:
         try:
             with open(filename, "r") as f:
                 for line in f:

@@ -1,16 +1,17 @@
 import random
 from collections import deque
+from typing import Deque, Any
 
 
 class MazeGenerator:
     def __init__(self, width: int, height: int) -> None:
         self.width: int = width
         self.height: int = height
-        self.grid: list[int] = [
+        self.grid: list[list[int]] = [
             [15 for _ in range(width)]
             for _ in range(height)
         ]
-        self.visited: list[bool] = [
+        self.visited: list[list[bool]] = [
             [False for _ in range(width)]
             for _ in range(height)
         ]
@@ -76,8 +77,10 @@ class MazeGenerator:
     def solve(
         self, start_x: int, start_y: int, end_x: int, end_y: int
     ) -> list[str]:
-        queue: list[tuple[int, int, list]] = deque([(start_x, start_y, [])])
-        visited: set[int, int] = set()
+        queue: Deque[tuple[int, int, list[Any]]] = deque(
+            [(start_x, start_y, [])]
+        )
+        visited: set[tuple[int, int]] = set()
         visited.add((start_x, start_y))
         while queue:
             x, y, path = queue.popleft()
@@ -105,7 +108,8 @@ class MazeGenerator:
         try:
             with open(file_output, "w") as fo:
                 for row in self.grid:
-                    fo.write("".join(str(hex(cell)[2:]).upper() for cell in row))
+                    fo.write(
+                        "".join(str(hex(cell)[2:]).upper() for cell in row))
                     fo.write("\n")
                 fo.write(f"\n{param['ENTRY'][0]},{param['ENTRY'][1]}\n")
                 fo.write(f"{param['EXIT'][0]},{param['EXIT'][1]}\n")
@@ -116,7 +120,8 @@ class MazeGenerator:
             print(f"ERROR: Cannot open the file {file_output}")
 
     def run_dfs(self, param):
-        self.visited = [[False for _ in range(self.width)] for _ in range(self.height)]
+        self.visited = [
+            [False for _ in range(self.width)] for _ in range(self.height)]
         if self.height >= 12 and self.width >= 11:
             self.generate_42()
         self.dfs_algo(param["ENTRY"][0], param["ENTRY"][1])

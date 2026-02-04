@@ -1,7 +1,4 @@
-class display():
-    def __init__(self):
-        pass
-
+class display:
     def display_bit(self, filename):
         try:
             mylist = []
