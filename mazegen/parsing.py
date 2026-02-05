@@ -1,4 +1,4 @@
-class Mazeconfig:
+class Mazeconfig:  # achraf
     def __init__(self, filename: str) -> None:
         self.param: dict = {}
         self.load_config(filename)

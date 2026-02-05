@@ -3,7 +3,7 @@ from collections import deque
 from typing import Deque, Any
 
 
-class MazeGenerator:
+class MazeGenerator:  # achraf
     def __init__(self, width: int, height: int) -> None:
         self.width: int = width
         self.height: int = height
@@ -15,9 +15,8 @@ class MazeGenerator:
             [False for _ in range(width)]
             for _ in range(height)
         ]
-        self.wall_color: str = "\033[34m"
 
-    def remove_wall(
+    def remove_wall(  # achraf
             self, x1: int, y1: int, x2: int, y2: int
     ) -> None:
         dx: int = x2 - x1
@@ -35,7 +34,7 @@ class MazeGenerator:
             self.grid[y1][x1] &= ~1
             self.grid[y2][x2] &= ~4
 
-    def generate_42(self):
+    def generate_42(self):  # amine
         y = (self.height // 2) - (5 // 2)
         x = (self.width // 2) - (7 // 2)
         matrix_42 = [
@@ -49,7 +48,7 @@ class MazeGenerator:
             for tup in i:
                 self.visited[y + tup[0]][x + tup[1]] = True
 
-    def get_nextors(self, x: int, y: int) -> list:
+    def get_nextors(self, x: int, y: int) -> list:  # amine
         mylist: list[tuple[int, int]] = []
         if x - 1 >= 0:
             if not self.visited[y][x - 1]:
@@ -65,7 +64,7 @@ class MazeGenerator:
                 mylist.append((y + 1, x))
         return mylist
 
-    def dfs_algo(self, x: int, y: int) -> None:
+    def dfs_algo(self, x: int, y: int) -> None:  # amine
         self.visited[y][x] = True
         nextors: list[tuple[int, int]] = self.get_nextors(x, y)
         random.shuffle(nextors)
@@ -74,7 +73,7 @@ class MazeGenerator:
                 self.remove_wall(x, y, nx, ny)
                 self.dfs_algo(nx, ny)
 
-    def solve(
+    def solve(  # achraf
         self, start_x: int, start_y: int, end_x: int, end_y: int
     ) -> list[str]:
         queue: Deque[tuple[int, int, list[Any]]] = deque(
@@ -104,7 +103,7 @@ class MazeGenerator:
                             queue.append((nx, ny, new_path))
         return []
 
-    def write_in_file(self, param: dict, file_output: str) -> None:
+    def write_in_file(self, param: dict, file_output: str) -> None:  # achraf
         try:
             with open(file_output, "w") as fo:
                 for row in self.grid:
@@ -119,14 +118,14 @@ class MazeGenerator:
         except Exception:
             print(f"ERROR: Cannot open the file {file_output}")
 
-    def run_dfs(self, param):
+    def run_dfs(self, param):  # amine
         self.visited = [
             [False for _ in range(self.width)] for _ in range(self.height)]
         if self.height >= 12 and self.width >= 11:
             self.generate_42()
         self.dfs_algo(param["ENTRY"][0], param["ENTRY"][1])
 
-    def main_generator(self, param: dict, file_output: str, check: int):
+    def main_generator(self, param: dict, file_output: str, check: int):  # 2
         if check:
             random.seed(8)
         if not param["PERFECT"]:

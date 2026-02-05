@@ -1,5 +1,5 @@
 class display:
-    def display_bit(self, filename):
+    def display_bit(self, filename):  # achraf
         try:
             mylist = []
             with open(filename, "r") as f:
@@ -20,7 +20,7 @@ class display:
             print(f"Error reading bit map: {e}")
             return []
 
-    def display_dir(self, filename):
+    def display_dir(self, filename):  # achraf
         try:
             flag = 0
             with open(filename, "r") as f:
@@ -34,7 +34,7 @@ class display:
             print(e)
             return []
 
-    def draw_with_solve(self, array, width, height, entry, exit_node, solve):
+    def draw_with_solve(self, array, width, height, entry, exit_node, solve):  # amine
         START_COLOR = '\033[49m'
         FORTY_COLOR = '\033[100m'
         WALL_COLOR = '\033[47m'
@@ -99,7 +99,7 @@ class display:
             output.append(line)
         return output
 
-    def draw_without_solve(self, array, width, height, entry, exit_node):
+    def draw_without_solve(self, array, width, height, entry, exit_node):  # achraf
         START_COLOR = '\033[49m'
         FORTY_COLOR = '\033[100m'
         WALL_COLOR = '\033[47m'
@@ -146,7 +146,7 @@ class display:
             output.append(line)
         return output
 
-    def create_solve_cor(self, entry, str):
+    def create_solve_cor(self, entry, str):  #amine
         x, y = entry
         mylist = []
         for i in str:
