@@ -2,59 +2,71 @@ import sys
 from mazegen import Mazeconfig, MazeGenerator, display
 
 
-def generate(ds, check, file_input, pars):
-    m = MazeGenerator(pars.param["WIDTH"], pars.param["HEIGHT"])
-    param = pars.load_config(file_input)
-    m.main_generator(param, pars.param["OUTPUT_FILE"], check)
-    array = ds.display_bit(pars.param["OUTPUT_FILE"])
-    if array:
-        h = len(array)
-        w = len(array[0])
-        result = ds.draw_without_solve(
-            array, w, h, pars.param["ENTRY"], pars.param["EXIT"])
+def generate(ds, check, param):
+    m = MazeGenerator(param["WIDTH"], param["HEIGHT"])
+    m.main_generator(param, param["OUTPUT_FILE"], check)
+    arr = ds.fprint_hex(param["OUTPUT_FILE"])
+    if arr:
+        h = len(arr)
+        w = len(arr[0])
+        result = ds.draw(
+            arr, w, h, param["ENTRY"], param["EXIT"],)
         for row in result:
             print(row)
 
 
-def solve_and_draw(ds, flag, pars):
-    dir = ds.display_dir(pars.param["OUTPUT_FILE"])
-    cor = ds.create_solve_cor(pars.param["ENTRY"], dir)
-    array = ds.display_bit(pars.param["OUTPUT_FILE"])
-    if array:
-        h = len(array)
-        w = len(array[0]) if h > 0 else 0
-        if flag % 2:
-            result = ds.draw_with_solve(
-                array, w, h, pars.param["ENTRY"], pars.param["EXIT"], cor)
-        else:
-            result = ds.draw_without_solve(
-                array, w, h, pars.param["ENTRY"], pars.param["EXIT"])
+def solve_and_draw(ds, flag, param):
+    dir = ds.display_dir(param["OUTPUT_FILE"])
+    cor = ds.create_solve_cor(param["ENTRY"], dir)
+    arr = ds.fprint_hex(param["OUTPUT_FILE"])
+    if arr:
+        h = len(arr)
+        w = len(arr[0]) if h > 0 else 0
+        result = ds.draw(
+                arr, w, h, param["ENTRY"], param["EXIT"], cor, flag)
         for row in result:
             print(row)
 
 
-def menu(file_input, pars):
+def menu(param):
     ds = display()
-    generate(ds, 1, file_input, pars)
+    generate(ds, 1, param)
     flag = 1
     while True:
         print("=== A-Maze-ing ===")
         print("1. Re-generate a new maze")
         print("2. Show/Hide path from entry to exit")
-        print("3. [Reserved]")
+        print("3. Rotate maze colors")
         print("4. Quit")
 
         try:
-            n = int(input("> "))
+            n = int(input("choice? (1-4):> "))
             match n:
                 case 1:
-                    generate(ds, 0, file_input, pars)
+                    generate(ds, 0, param)
                     flag = 1
                 case 2:
-                    solve_and_draw(ds, flag, pars)
+                    solve_and_draw(ds, flag, param)
                     flag += 1
                 case 3:
-                    print("Option 3 is not implemented yet.")
+                    print("choose your color for wall")
+                    print("1. Purple")
+                    print("2. green")
+                    print("3. Blue")
+                    print("4. back")
+                    c = int(input("choice? (1-4):> "))
+                    match c:
+                        case 1:
+                            ds.WALL_COLOR = '\033[105m'
+                            ds.FORTY2_COLOR = '\033[107m'
+                        case 2:
+                            ds.WALL_COLOR = '\033[48;5;118m'
+                            ds.FORTY2_COLOR = '\033[107m'
+                        case 3:
+                            ds.WALL_COLOR = '\033[48;5;117m'
+                            ds.FORTY2_COLOR = '\033[105m'
+                        case 4:
+                            pass
                 case 4:
                     sys.exit()
                 case _:
@@ -68,8 +80,13 @@ if __name__ == "__main__":
         if len(sys.argv) < 2:
             raise Exception("You did not enter a file name")
         if sys.argv[1]:
-            pars = Mazeconfig(sys.argv[1])
-            menu(sys.argv[1], pars)
-
+            config = Mazeconfig(sys.argv[1])
+            param = config.load_config(sys.argv[1])
+            entry_x, entry_y = param["ENTRY"][0], param["ENTRY"][1]
+            exit_x, exit_y = param["EXIT"][0], param["EXIT"][1]
+            w, h = param["WIDTH"], param["HEIGHT"]
+            if (entry_x < 0 or entry_y < 0) or (exit_x >= w or exit_y >= h):
+                raise Exception("Entry or exit position is invalid ")
+            menu(param)
     except Exception as e:
         print(e)

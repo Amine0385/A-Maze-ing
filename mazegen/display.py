@@ -1,5 +1,13 @@
 class display:
-    def display_bit(self, filename):  # achraf
+    def __init__(self, color_wall='\033[107m', forty2_color='\033[100m'):  # am
+        self.START_COLOR = '\033[49m'
+        self.FORTY2_COLOR = forty2_color
+        self.WALL_COLOR = color_wall
+        self.PATH_COLOR = '\033[49m'
+        self.SOLVE_COLOR = '\033[48;5;94m'
+        self.RESET = '\033[0m'
+
+    def fprint_hex(self, filename):  # achraf
         try:
             mylist = []
             with open(filename, "r") as f:
@@ -34,13 +42,7 @@ class display:
             print(e)
             return []
 
-    def draw_with_solve(self, array, width, height, entry, exit_node, solve):  # amine
-        START_COLOR = '\033[49m'
-        FORTY_COLOR = '\033[100m'
-        WALL_COLOR = '\033[47m'
-        PATH_COLOR = '\033[49m'
-        SOLVE_COLOR = '\033[46m'
-        RESET = '\033[0m'
+    def draw(self, array, width, height, entry, exit_node, solve=(), fla=1):
         canvas_h = height * 2 + 1
         canvas_w = width * 2 + 1
         matrix = [[1 for _ in range(canvas_w)] for _ in range(canvas_h)]
@@ -63,68 +65,18 @@ class display:
         output = []
         solve_pixels = set()
         curr_x, curr_y = entry
+        if fla % 2:
+            for next_y, next_x in solve:
+                p1_r = 2 * curr_y + 1
+                p1_c = 2 * curr_x + 1
+                p2_r = 2 * next_y + 1
+                p2_c = 2 * next_x + 1
 
-        for next_y, next_x in solve:
-            p1_r = 2 * curr_y + 1
-            p1_c = 2 * curr_x + 1
-            p2_r = 2 * next_y + 1
-            p2_c = 2 * next_x + 1
-
-            solve_pixels.add((p2_r, p2_c))
-            mid_r = (p1_r + p2_r) // 2
-            mid_c = (p1_c + p2_c) // 2
-            solve_pixels.add((mid_r, mid_c))
-            curr_y, curr_x = next_y, next_x
-        for r in range(canvas_h):
-            line = ""
-            for c in range(canvas_w):
-                is_wall = matrix[r][c] == 1
-                is_42 = matrix[r][c] == 2
-                is_entry = (r == entry[1] * 2 + 1 and c == entry[0] * 2 + 1)
-                is_exit = (
-                    r == exit_node[1] * 2 + 1 and c ==true exit_node[0] * 2 + 1)
-                is_solve = (r, c) in solve_pixels
-                if is_wall:
-                    line += f"{WALL_COLOR}  {RESET}"
-                elif is_entry:
-                    line += f"{START_COLOR}🚕{RESET}"
-                elif is_exit:
-                    line += f"🏁{RESET}"
-                elif is_42:
-                    line += f"{FORTY_COLOR}  {RESET}"
-                elif is_solve:
-                    line += f"{SOLVE_COLOR}  {RESET}"
-                else:
-                    line += f"{PATH_COLOR}  {RESET}"
-            output.append(line)
-        return output
-
-    def draw_without_solve(self, array, width, height, entry, exit_node):  # achraf
-        START_COLOR = '\033[49m'
-        FORTY_COLOR = '\033[100m'
-        WALL_COLOR = '\033[47m'
-        PATH_COLOR = '\033[49m'
-        RESET = '\033[0m'
-        canvas_h = height * 2 + 1
-        canvas_w = width * 2 + 1
-        matrix = [[1 for _ in range(canvas_w)] for _ in range(canvas_h)]
-        for y in range(height):
-            for x in range(width):
-                cell = array[y][x]
-                cy = y * 2 + 1
-                cx = x * 2 + 1
-                matrix[cy][cx] = 0
-                if not (cell & 1):
-                    matrix[cy-1][cx] = 0
-                if (cell & 1) and (cell & 2) and (cell & 4) and (cell & 8):
-                    matrix[cy][cx] = 2
-                if not (cell & 4):
-                    matrix[cy+1][cx] = 0
-                if not (cell & 8):
-                    matrix[cy][cx-1] = 0
-                if not (cell & 2):
-                    matrix[cy][cx+1] = 0
-        output = []
+                solve_pixels.add((p2_r, p2_c))
+                mid_r = (p1_r + p2_r) // 2
+                mid_c = (p1_c + p2_c) // 2
+                solve_pixels.add((mid_r, mid_c))
+                curr_y, curr_x = next_y, next_x
         for r in range(canvas_h):
             line = ""
             for c in range(canvas_w):
@@ -133,16 +85,20 @@ class display:
                 is_entry = (r == entry[1] * 2 + 1 and c == entry[0] * 2 + 1)
                 is_exit = (
                     r == exit_node[1] * 2 + 1 and c == exit_node[0] * 2 + 1)
+                if fla % 2:
+                    is_solve = (r, c) in solve_pixels
                 if is_wall:
-                    line += f"{WALL_COLOR}  {RESET}"
+                    line += f"{self.WALL_COLOR}  {self.RESET}"
                 elif is_entry:
-                    line += f"{START_COLOR}🚕{RESET}"
+                    line += f"{self.START_COLOR}🚕{self.RESET}"
                 elif is_exit:
-                    line += f"🏁{RESET}"
+                    line += f"🏁{self.RESET}"
                 elif is_42:
-                    line += f"{FORTY_COLOR}  {RESET}"
+                    line += f"{self.FORTY2_COLOR}  {self.RESET}"
+                elif fla % 2 and is_solve:
+                    line += f"{self.SOLVE_COLOR}  {self.RESET}"
                 else:
-                    line += f"{PATH_COLOR}  {RESET}"
+                    line += f"{self.PATH_COLOR}  {self.RESET}"
             output.append(line)
         return output
 

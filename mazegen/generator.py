@@ -1,4 +1,5 @@
 import random
+import sys
 from collections import deque
 from typing import Deque, Any
 
@@ -34,7 +35,7 @@ class MazeGenerator:  # achraf
             self.grid[y1][x1] &= ~1
             self.grid[y2][x2] &= ~4
 
-    def generate_42(self):  # amine
+    def generate_42(self, exit, entry):  # amine
         y = (self.height // 2) - (5 // 2)
         x = (self.width // 2) - (7 // 2)
         matrix_42 = [
@@ -44,6 +45,14 @@ class MazeGenerator:  # achraf
             [(3, 2), (3, 4)],
             [(4, 2), (4, 4), (4, 5), (4, 6)]
         ]
+        exit_x, exit_y = exit[0] - x, exit[1] - y
+        entry_x, entry_y = entry[0] - x, entry[1] - y
+        for cor in matrix_42:
+            if (exit_y, exit_x) in cor:
+                raise Exception("Invalid maze: exit is inside the 42 zone")
+            if (entry_y, entry_x) in cor:
+                raise Exception("Invalid maze: entry is inside the 42 zone")
+        print(exit_y, exit_x)
         for i in matrix_42:
             for tup in i:
                 self.visited[y + tup[0]][x + tup[1]] = True
@@ -122,13 +131,17 @@ class MazeGenerator:  # achraf
         self.visited = [
             [False for _ in range(self.width)] for _ in range(self.height)]
         if self.height >= 12 and self.width >= 11:
-            self.generate_42()
+            self.generate_42(param["EXIT"], param["ENTRY"])
         self.dfs_algo(param["ENTRY"][0], param["ENTRY"][1])
 
     def main_generator(self, param: dict, file_output: str, check: int):  # 2
         if check:
             random.seed(8)
-        if not param["PERFECT"]:
+        try:
+            if not param["PERFECT"]:
+                self.run_dfs(param)
             self.run_dfs(param)
-        self.run_dfs(param)
-        self.write_in_file(param, file_output)
+            self.write_in_file(param, file_output)
+        except Exception as e:
+            print(e)
+            sys.exit()
