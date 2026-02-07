@@ -5,6 +5,14 @@ from parsing import Mazeconfig
 
 
 def generate(ds: display, check: int, param: dict) -> None:
+    """Generates a maze, saves it to a file, and displays it.
+
+    Args:
+        ds (display): Display object used for rendering.
+        check (int): Random seed flag; 1 for reproducible maze.
+        param (dict): Maze parameters including
+        WIDTH, HEIGHT, ENTRY, EXIT, OUTPUT_FILE.
+    """
     m = MazeGenerator(param["WIDTH"], param["HEIGHT"])
     m.main_generator(param, param["OUTPUT_FILE"], check)
     arr = ds.read_hex(param["OUTPUT_FILE"])
@@ -18,6 +26,14 @@ def generate(ds: display, check: int, param: dict) -> None:
 
 
 def solve_and_draw(ds: display, flag: int, param: dict) -> None:
+    """Reads the solution path and displays the maze with the path.
+
+    Args:
+        ds (display): Display object used for rendering.
+        flag (int): Toggle for showing/hiding path.
+        param (dict): Maze parameters including
+        WIDTH, HEIGHT, ENTRY, EXIT, OUTPUT_FILE.
+    """
     dir = ds.read_dir(param["OUTPUT_FILE"])
     cor = ds.create_solve_cor(param["ENTRY"], dir)
     matrice = ds.read_hex(param["OUTPUT_FILE"])
@@ -31,6 +47,18 @@ def solve_and_draw(ds: display, flag: int, param: dict) -> None:
 
 
 def menu(param: dict) -> None:
+    """Displays the interactive menu for maze operations.
+
+    Options include:
+        1. Re-generate the maze
+        2. Show/Hide solution path
+        3. Rotate wall colors
+        4. Quit
+
+    Args:
+        param (dict): Maze parameters including
+        WIDTH, HEIGHT, ENTRY, EXIT, OUTPUT_FILE.
+    """
     ds = display()
     print('\x1B[2J\x1B[H', end='')
     generate(ds, 1, param)

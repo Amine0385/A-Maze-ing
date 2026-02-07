@@ -2,10 +2,29 @@ from typing import Any
 
 
 class display:
+    """Class for rendering mazes, reading maze data, and displaying solutions.
+
+    Attributes:
+        START_COLOR (str): Color for the maze background.
+        FORTY2_COLOR (str): Color for the reserved 42-shaped area.
+        WALL_COLOR (str): Color for maze walls.
+        PATH_COLOR (str): Color for empty paths.
+        SOLVE_COLOR (str): Color for solution path.
+        RESET (str): ANSI reset code for colors.
+    """
     def __init__(
             self,
             color_wall: str = '\033[107m',
-            forty2_color: str = '\033[100m') -> None:
+            forty2_color: str = '\033[100m'
+    ) -> None:
+        """Initializes display colors for maze rendering.
+
+        Args:
+            color_wall (str, optional): Color code for walls.
+            Defaults to white background.
+            forty2_color (str, optional): Color code for 42-area.
+            Defaults to dark gray background.
+        """
         self.START_COLOR = '\033[49m'
         self.FORTY2_COLOR = forty2_color
         self.WALL_COLOR = color_wall
@@ -14,6 +33,15 @@ class display:
         self.RESET = '\033[0m'
 
     def read_hex(self, filename: str) -> list[Any]:
+        """Reads a maze grid from a file in hexadecimal format.
+
+        Args:
+            filename (str): Path to the maze file.
+
+        Returns:
+            List[List[int]]: 2D list representing the maze grid.
+            Empty list if an error occurs.
+        """
         try:
             mylist = []
             with open(filename, "r") as f:
@@ -35,6 +63,15 @@ class display:
             return []
 
     def read_dir(self, filename: str) -> str:
+        """Reads the solution path directions from a maze file.
+
+        Args:
+            filename (str): Path to the maze file.
+
+        Returns:
+            str: String of directions ('N', 'S', 'E', 'W').
+            Empty string if not found or error occurs.
+        """
         try:
             flag = 0
             with open(filename, "r") as f:
@@ -49,11 +86,31 @@ class display:
             print(e)
             return ""
 
-    def draw(self,
-             array: list[list[Any]], width: int, height: int,
-             entry: tuple[Any, Any], exit_node: tuple[Any, Any],
-             solve: list[tuple[Any, Any]] = [(0, 0)],
-             fla: int = 1) -> list[str]:
+    def draw(
+            self,
+            array: list[list[Any]], width: int, height: int,
+            entry: tuple[Any, Any], exit_node: tuple[Any, Any],
+            solve: list[tuple[Any, Any]] = [(0, 0)],
+            fla: int = 1
+    ) -> list[str]:
+        """Draws the maze as a list of strings with colors
+        and optional solution path.
+
+        Args:
+            array (List[List[Any]]): Maze grid with wall information.
+            width (int): Maze width.
+            height (int): Maze height.
+            entry (Tuple[int, int]): Entry coordinates.
+            exit_node (Tuple[int, int]): Exit coordinates.
+            solve (List[Tuple[int, int]], optional): List of solution
+            coordinates. Defaults to [(0,0)].
+            fla (int, optional): Flag to show/hide solution path.
+            Defaults to 1.
+
+        Returns:
+            List[str]: List of strings representing colored
+            maze rows for terminal output.
+        """
         canvas_h = height * 2 + 1
         canvas_w = width * 2 + 1
         matrix = [
@@ -116,6 +173,17 @@ class display:
 
     def create_solve_cor(
             self, entry: tuple[Any, Any], str: str) -> list[tuple[Any, Any]]:
+        """Converts a string of directions into a list of coordinates
+        representing the solution path.
+
+        Args:
+            entry (Tuple[int, int]): Starting coordinates.
+            str (str): String of directions ('N', 'S', 'E', 'W').
+
+        Returns:
+            List[Tuple[int, int]]: List of coordinates
+            traversed following the directions.
+        """
         x, y = entry
         mylist = []
         for i in str:

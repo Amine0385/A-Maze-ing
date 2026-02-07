@@ -5,7 +5,23 @@ from typing import Deque, Any
 
 
 class MazeGenerator:
+    """Generates and solves mazes using depth-first search (DFS).
+
+    Attributes:
+        width (int): Width of the maze.
+        height (int): Height of the maze.
+        grid (List[List[int]]): 2D grid representing the maze,
+        walls encoded as bits.
+        visited (List[List[bool]]): 2D grid tracking visited cells
+        during generation.
+    """
     def __init__(self, width: int, height: int) -> None:
+        """Initializes the maze grid and visited matrix.
+
+        Args:
+            width (int): Width of the maze.
+            height (int): Height of the maze.
+        """
         self.width: int = width
         self.height: int = height
         self.grid: list[list[int]] = [
@@ -20,6 +36,14 @@ class MazeGenerator:
     def remove_wall(
             self, x1: int, y1: int, x2: int, y2: int
     ) -> None:
+        """Removes the wall between two adjacent cells.
+
+        Args:
+            x1 (int): X-coordinate of the first cell.
+            y1 (int): Y-coordinate of the first cell.
+            x2 (int): X-coordinate of the second cell.
+            y2 (int): Y-coordinate of the second cell.
+        """
         dx: int = x2 - x1
         dy: int = y2 - y1
         if dx == 1:
@@ -37,6 +61,15 @@ class MazeGenerator:
 
     def generate_42(
             self, exit: tuple[Any, Any], entry: tuple[Any, Any]) -> None:
+        """Reserves a 42-shaped pattern in the maze center.
+
+        Args:
+            exit (Tuple[int, int]): Coordinates of the maze exit.
+            entry (Tuple[int, int]): Coordinates of the maze entry.
+
+        Raises:
+            Exception: If the entry or exit is inside the reserved 42 zone.
+        """
         y = (self.height // 2) - (5 // 2)
         x = (self.width // 2) - (7 // 2)
         matrix_42 = [
@@ -58,6 +91,15 @@ class MazeGenerator:
                 self.visited[y + tup[0]][x + tup[1]] = True
 
     def get_nextors(self, x: int, y: int) -> list[Any]:
+        """Returns a list of unvisited neighboring cells.
+
+        Args:
+            x (int): X-coordinate of the current cell.
+            y (int): Y-coordinate of the current cell.
+
+        Returns:
+            List[Tuple[int, int]]: Coordinates of unvisited neighboring cells.
+        """
         mylist: list[tuple[int, int]] = []
         if x - 1 >= 0:
             if not self.visited[y][x - 1]:
@@ -74,6 +116,12 @@ class MazeGenerator:
         return mylist
 
     def dfs_algo(self, x: int, y: int) -> None:
+        """Generates the maze recursively using depth-first search.
+
+        Args:
+            x (int): X-coordinate of the current cell.
+            y (int): Y-coordinate of the current cell.
+        """
         self.visited[y][x] = True
         nextors: list[tuple[int, int]] = self.get_nextors(x, y)
         random.shuffle(nextors)
@@ -85,6 +133,18 @@ class MazeGenerator:
     def solve(
         self, start_x: int, start_y: int, end_x: int, end_y: int
     ) -> list[str]:
+        """Solves the maze using breadth-first search.
+
+        Args:
+            start_x (int): X-coordinate of the start cell.
+            start_y (int): Y-coordinate of the start cell.
+            end_x (int): X-coordinate of the exit cell.
+            end_y (int): Y-coordinate of the exit cell.
+
+        Returns:
+            List[str]: Sequence of directions
+            ('N', 'S', 'E', 'W') from start to exit.
+        """
         queue: Deque[tuple[int, int, list[Any]]] = deque(
             [(start_x, start_y, [])]
         )
@@ -113,6 +173,12 @@ class MazeGenerator:
         return []
 
     def write_in_file(self, param: dict, file_output: str) -> None:
+        """Writes the maze, entry/exit, and solution path to a file.
+
+        Args:
+            param (dict): Maze configuration containing 'ENTRY' and 'EXIT'.
+            file_output (str): File path to write the maze and solution.
+        """
         try:
             with open(file_output, "w") as fo:
                 for row in self.grid:
@@ -128,6 +194,11 @@ class MazeGenerator:
             print(f"ERROR: Cannot open the file {file_output}")
 
     def run_dfs(self, param: dict) -> None:
+        """Resets visited cells and runs DFS to generate the maze.
+
+        Args:
+            param (dict): Dictionary containing 'ENTRY' and 'EXIT'.
+        """
         self.visited = [
             [False for _ in range(self.width)] for _ in range(self.height)]
         if self.height >= 12 and self.width >= 11:
@@ -136,6 +207,14 @@ class MazeGenerator:
 
     def main_generator(
             self, param: dict, file_output: str, check: int) -> None:
+        """Main function to generate the maze and write it to file.
+
+        Args:
+            param (dict): Maze configuration parameters.
+            file_output (str): Output file path.
+            check (int): Seed flag; if 1, random seed is fixed
+            for reproducibility.
+        """
         if check:
             random.seed(1)
         try:
