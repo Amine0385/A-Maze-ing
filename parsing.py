@@ -1,7 +1,6 @@
-class Mazeconfig:  # achraf
+class Mazeconfig:
     def __init__(self) -> None:
         self.param: dict = {}
-        # self.load_config(filename)
 
     def load_config(self, filename: str) -> dict:
         try:
@@ -27,8 +26,8 @@ class Mazeconfig:  # achraf
                                 self.param[key] = value.upper() == "TRUE"
                         except Exception as e:
                             print(f"Error parsing line '{line}': {e}")
-                            return None
+                            return {}
             return self.param
         except Exception:
             print("ERROR: cannot open the file")
-        print(self.param)
+            return {}

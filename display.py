@@ -1,5 +1,11 @@
+from typing import Any
+
+
 class display:
-    def __init__(self, color_wall='\033[107m', forty2_color='\033[100m'):  # am
+    def __init__(
+            self,
+            color_wall: str = '\033[107m',
+            forty2_color: str = '\033[100m') -> None:
         self.START_COLOR = '\033[49m'
         self.FORTY2_COLOR = forty2_color
         self.WALL_COLOR = color_wall
@@ -7,7 +13,7 @@ class display:
         self.SOLVE_COLOR = '\033[48;5;94m'
         self.RESET = '\033[0m'
 
-    def read_hex(self, filename):  # achraf
+    def read_hex(self, filename: str) -> list[Any]:
         try:
             mylist = []
             with open(filename, "r") as f:
@@ -28,7 +34,7 @@ class display:
             print(f"Error reading bit map: {e}")
             return []
 
-    def read_dir(self, filename):  # achraf
+    def read_dir(self, filename: str) -> str:
         try:
             flag = 0
             with open(filename, "r") as f:
@@ -38,14 +44,19 @@ class display:
                     if flag == 1:
                         if "," not in line:
                             return line.strip()
+                return ""
         except Exception as e:
             print(e)
-            return []
+            return ""
 
-    def draw(self, array, width, height, entry, exit_node, solve=(), fla=1):
+    def draw(self,
+             array: list[list[Any]], width: int, height: int,
+             entry: tuple[Any, Any], exit_node: tuple[Any, Any],
+             solve: tuple = (), fla: int = 1) -> list[str]:
         canvas_h = height * 2 + 1
         canvas_w = width * 2 + 1
-        matrix = [[1 for _ in range(canvas_w)] for _ in range(canvas_h)]
+        matrix = [
+            [1 for _ in range(canvas_w)] for _ in range(canvas_h)]
         for y in range(height):
             for x in range(width):
                 cell = array[y][x]
@@ -102,7 +113,8 @@ class display:
             output.append(line)
         return output
 
-    def create_solve_cor(self, entry, str):  # amine
+    def create_solve_cor(
+            self, entry: tuple[Any, Any], str: str) -> list[tuple[Any, Any]]:
         x, y = entry
         mylist = []
         for i in str:

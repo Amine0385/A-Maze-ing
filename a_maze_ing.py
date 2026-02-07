@@ -4,20 +4,20 @@ from display import display
 from parsing import Mazeconfig
 
 
-def generate(ds, check, param):
+def generate(ds: display, check: int, param: dict) -> None:
     m = MazeGenerator(param["WIDTH"], param["HEIGHT"])
     m.main_generator(param, param["OUTPUT_FILE"], check)
     arr = ds.read_hex(param["OUTPUT_FILE"])
     if arr:
-        h = len(arr)
-        w = len(arr[0])
+        w = param["WIDTH"]
+        h = param["HEIGHT"]
         result = ds.draw(
-            arr, w, h, param["ENTRY"], param["EXIT"],)
+            arr, w, h, param["ENTRY"], param["EXIT"])
         for row in result:
             print(row)
 
 
-def solve_and_draw(ds, flag, param):
+def solve_and_draw(ds: display, flag: int, param: dict) -> None:
     dir = ds.read_dir(param["OUTPUT_FILE"])
     cor = ds.create_solve_cor(param["ENTRY"], dir)
     matrice = ds.read_hex(param["OUTPUT_FILE"])
@@ -30,7 +30,7 @@ def solve_and_draw(ds, flag, param):
             print(row)
 
 
-def menu(param):
+def menu(param: dict) -> None:
     ds = display()
     generate(ds, 1, param)
     flag = 1
