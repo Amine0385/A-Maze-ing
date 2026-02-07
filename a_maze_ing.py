@@ -32,6 +32,7 @@ def solve_and_draw(ds: display, flag: int, param: dict) -> None:
 
 def menu(param: dict) -> None:
     ds = display()
+    print('\x1B[2J\x1B[H', end='')
     generate(ds, 1, param)
     flag = 1
     while True:
@@ -45,9 +46,11 @@ def menu(param: dict) -> None:
             n = int(input("choice? (1-4):> "))
             match n:
                 case 1:
+                    print('\x1B[2J\x1B[H', end='')
                     generate(ds, 0, param)
                     flag = 1
                 case 2:
+                    print('\x1B[2J\x1B[H', end='')
                     solve_and_draw(ds, flag, param)
                     flag += 1
                 case 3:

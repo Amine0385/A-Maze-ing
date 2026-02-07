@@ -52,7 +52,8 @@ class display:
     def draw(self,
              array: list[list[Any]], width: int, height: int,
              entry: tuple[Any, Any], exit_node: tuple[Any, Any],
-             solve: tuple = (), fla: int = 1) -> list[str]:
+             solve: list[tuple[Any, Any]] = [(0, 0)],
+             fla: int = 1) -> list[str]:
         canvas_h = height * 2 + 1
         canvas_w = width * 2 + 1
         matrix = [
