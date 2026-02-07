@@ -1,11 +1,13 @@
 import sys
-from mazegen import Mazeconfig, MazeGenerator, display
+from mazegen import MazeGenerator
+from display import display
+from parsing import Mazeconfig
 
 
 def generate(ds, check, param):
     m = MazeGenerator(param["WIDTH"], param["HEIGHT"])
     m.main_generator(param, param["OUTPUT_FILE"], check)
-    arr = ds.fprint_hex(param["OUTPUT_FILE"])
+    arr = ds.read_hex(param["OUTPUT_FILE"])
     if arr:
         h = len(arr)
         w = len(arr[0])
@@ -16,14 +18,14 @@ def generate(ds, check, param):
 
 
 def solve_and_draw(ds, flag, param):
-    dir = ds.display_dir(param["OUTPUT_FILE"])
+    dir = ds.read_dir(param["OUTPUT_FILE"])
     cor = ds.create_solve_cor(param["ENTRY"], dir)
-    arr = ds.fprint_hex(param["OUTPUT_FILE"])
-    if arr:
-        h = len(arr)
-        w = len(arr[0]) if h > 0 else 0
+    matrice = ds.read_hex(param["OUTPUT_FILE"])
+    if matrice:
+        w = param["WIDTH"]
+        h = param["HEIGHT"]
         result = ds.draw(
-                arr, w, h, param["ENTRY"], param["EXIT"], cor, flag)
+                matrice, w, h, param["ENTRY"], param["EXIT"], cor, flag)
         for row in result:
             print(row)
 
@@ -80,13 +82,17 @@ if __name__ == "__main__":
         if len(sys.argv) < 2:
             raise Exception("You did not enter a file name")
         if sys.argv[1]:
-            config = Mazeconfig(sys.argv[1])
+            config = Mazeconfig()
             param = config.load_config(sys.argv[1])
             entry_x, entry_y = param["ENTRY"][0], param["ENTRY"][1]
             exit_x, exit_y = param["EXIT"][0], param["EXIT"][1]
             w, h = param["WIDTH"], param["HEIGHT"]
-            if (entry_x < 0 or entry_y < 0) or (exit_x >= w or exit_y >= h):
-                raise Exception("Entry or exit position is invalid ")
+            if (entry_x < 0 or entry_y < 0) or (entry_x >= w or entry_y >= h):
+                raise Exception("Entry position is invalid ")
+            if (exit_x < 0 or exit_y < 0) or (exit_x >= w or exit_y >= h):
+                raise Exception("exit position is invalid ")
+            if (entry_x == exit_x) and (entry_y == exit_y):
+                raise Exception("Entry and exit cannot be the same.")
             menu(param)
     except Exception as e:
         print(e)

@@ -7,7 +7,7 @@ class display:
         self.SOLVE_COLOR = '\033[48;5;94m'
         self.RESET = '\033[0m'
 
-    def fprint_hex(self, filename):  # achraf
+    def read_hex(self, filename):  # achraf
         try:
             mylist = []
             with open(filename, "r") as f:
@@ -28,7 +28,7 @@ class display:
             print(f"Error reading bit map: {e}")
             return []
 
-    def display_dir(self, filename):  # achraf
+    def read_dir(self, filename):  # achraf
         try:
             flag = 0
             with open(filename, "r") as f:
@@ -54,14 +54,14 @@ class display:
                 matrix[cy][cx] = 0
                 if not (cell & 1):
                     matrix[cy-1][cx] = 0
-                if (cell & 1) and (cell & 2) and (cell & 4) and (cell & 8):
-                    matrix[cy][cx] = 2
+                if not (cell & 2):
+                    matrix[cy][cx+1] = 0
                 if not (cell & 4):
                     matrix[cy+1][cx] = 0
                 if not (cell & 8):
                     matrix[cy][cx-1] = 0
-                if not (cell & 2):
-                    matrix[cy][cx+1] = 0
+                if (cell & 1) and (cell & 2) and (cell & 4) and (cell & 8):
+                    matrix[cy][cx] = 2
         output = []
         solve_pixels = set()
         curr_x, curr_y = entry

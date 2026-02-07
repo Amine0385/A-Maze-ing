@@ -52,7 +52,6 @@ class MazeGenerator:  # achraf
                 raise Exception("Invalid maze: exit is inside the 42 zone")
             if (entry_y, entry_x) in cor:
                 raise Exception("Invalid maze: entry is inside the 42 zone")
-        print(exit_y, exit_x)
         for i in matrix_42:
             for tup in i:
                 self.visited[y + tup[0]][x + tup[1]] = True
@@ -102,8 +101,8 @@ class MazeGenerator:  # achraf
                 (-1, 0, 'W', 8)
             ]
             for dx, dy, dir, wall_bit in move:
-                nx: int = x + dx
-                ny: int = y + dy
+                nx = x + dx
+                ny = y + dy
                 if 0 <= nx < self.width and 0 <= ny < self.height:
                     if not (current_cell & wall_bit):
                         if (nx, ny) not in visited:
@@ -136,7 +135,7 @@ class MazeGenerator:  # achraf
 
     def main_generator(self, param: dict, file_output: str, check: int):  # 2
         if check:
-            random.seed(8)
+            random.seed(1)
         try:
             if not param["PERFECT"]:
                 self.run_dfs(param)
