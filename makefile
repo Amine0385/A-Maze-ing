@@ -18,8 +18,9 @@ run:
 
 clean:
 	rm -rf build/ dist/ mazegen/__pycache__ *.egg-info __pycache__ .mypy_cache \
-	*output*.txt
-	rm -f *.whl *.tar.gz 
+	rm -rf *output*.txt
+	rm -rf src/__pycache__ src/*.egg-info
+	rm -rf *.whl *.tar.gz 
 
 lint:
 	python3 -m flake8 .
