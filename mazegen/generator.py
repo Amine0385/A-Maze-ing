@@ -49,13 +49,13 @@ class MazeGenerator:
         if dx == 1:
             self.grid[y1][x1] &= ~2
             self.grid[y2][x2] &= ~8
-        if dx == -1:
+        elif dx == -1:
             self.grid[y1][x1] &= ~8
             self.grid[y2][x2] &= ~2
-        if dy == 1:
+        elif dy == 1:
             self.grid[y1][x1] &= ~4
             self.grid[y2][x2] &= ~1
-        if dy == -1:
+        elif dy == -1:
             self.grid[y1][x1] &= ~1
             self.grid[y2][x2] &= ~4
 

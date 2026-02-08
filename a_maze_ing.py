@@ -1,7 +1,7 @@
 import sys
 from mazegen import MazeGenerator
-from display import display
-from parsing import Mazeconfig
+from src.display import display
+from src.parsing import Mazeconfig
 
 
 def generate(ds: display, check: int, param: dict) -> None:
