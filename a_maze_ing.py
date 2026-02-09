@@ -1,7 +1,6 @@
 import sys
 from mazegen import MazeGenerator
-from src.display import display
-from src.parsing import Mazeconfig
+from src import display, Mazeconfig
 
 
 def generate(ds: display, check: int, param: dict) -> None:
@@ -20,7 +19,8 @@ def generate(ds: display, check: int, param: dict) -> None:
         w = param["WIDTH"]
         h = param["HEIGHT"]
         result = ds.draw(
-            arr, w, h, param["ENTRY"], param["EXIT"])
+            arr, w, h, param["ENTRY"], param["EXIT"], param["ENTRY"][0],
+            param["ENTRY"][1])
         for row in result:
             print(row)
 

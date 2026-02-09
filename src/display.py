@@ -90,7 +90,7 @@ class display:
             self,
             array: list[list[Any]], width: int, height: int,
             entry: tuple[Any, Any], exit_node: tuple[Any, Any],
-            solve: list[tuple[Any, Any]] = [(0, 0)],
+            solve: list[tuple[Any, Any]],
             fla: int = 1
     ) -> list[str]:
         """Draws the maze as a list of strings with colors
